@@ -42,23 +42,30 @@ const FLTImagePickerMIMEType kFLTImagePickerMIMETypeDefault = FLTImagePickerMIME
 }
 
 + (NSDictionary *)getMetaDataFromImageData:(NSData *)imageData {
-  CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)imageData, NULL);
-  NSDictionary *metadata =
-      (NSDictionary *)CFBridgingRelease(CGImageSourceCopyPropertiesAtIndex(source, 0, NULL));
-  CFRelease(source);
-  return metadata;
+    if (imageData != nil) {
+        CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)imageData, NULL);
+        NSDictionary *metadata =
+            (NSDictionary *)CFBridgingRelease(CGImageSourceCopyPropertiesAtIndex(source, 0, NULL));
+        CFRelease(source);
+        return  metadata;
+    }
+ 
+  return nil;
 }
 
 + (NSData *)updateMetaData:(NSDictionary *)metaData toImage:(NSData *)imageData {
-  NSMutableData *mutableData = [NSMutableData data];
-  CGImageSourceRef cgImage = CGImageSourceCreateWithData((__bridge CFDataRef)imageData, NULL);
-  CGImageDestinationRef destination = CGImageDestinationCreateWithData(
-      (__bridge CFMutableDataRef)mutableData, CGImageSourceGetType(cgImage), 1, nil);
-  CGImageDestinationAddImageFromSource(destination, cgImage, 0, (__bridge CFDictionaryRef)metaData);
-  CGImageDestinationFinalize(destination);
-  CFRelease(cgImage);
-  CFRelease(destination);
-  return mutableData;
+    if (imageData != nil && metaData != nil) {
+        NSMutableData *mutableData = [NSMutableData data];
+        CGImageSourceRef cgImage = CGImageSourceCreateWithData((__bridge CFDataRef)imageData, NULL);
+        CGImageDestinationRef destination = CGImageDestinationCreateWithData(
+            (__bridge CFMutableDataRef)mutableData, CGImageSourceGetType(cgImage), 1, nil);
+        CGImageDestinationAddImageFromSource(destination, cgImage, 0, (__bridge CFDictionaryRef)metaData);
+        CGImageDestinationFinalize(destination);
+        CFRelease(cgImage);
+        CFRelease(destination);
+        return mutableData;
+    }
+    return nil;
 }
 
 + (NSData *)convertImage:(UIImage *)image

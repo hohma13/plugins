@@ -295,7 +295,13 @@ static const int SOURCE_GALLERY = 1;
     if (image == nil) {
       image = [info objectForKey:UIImagePickerControllerOriginalImage];
     }
-
+    
+      if (image == nil) {
+          self.result([FlutterError errorWithCode:@"invalid_image" message:@"User selected invalid image" details:nil]);
+          self.result = nil;
+          return;
+      }
+      
     NSNumber *maxWidth = [_arguments objectForKey:@"maxWidth"];
     NSNumber *maxHeight = [_arguments objectForKey:@"maxHeight"];
     NSNumber *imageQuality = [_arguments objectForKey:@"imageQuality"];
